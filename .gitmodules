@@ -1,0 +1,4 @@
+[submodule "inputs/openneuro"]
+	path = inputs/openneuro
+	url = http://datasets.datalad.org/openneuro/.git
+	datalad-id = 2ecbb6ba-f811-11e8-b1ed-002590f97d84
