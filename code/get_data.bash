@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPENNEURO=data/inputs/openneuro/
+OPENNEURO=../inputs/openneuro/
 
 # Here get the container, more specifically for slurm compatibility
 
