@@ -20,13 +20,13 @@ module load singularity/3.6
 #copying input dataset into local scratch space
 rsync -rltv --info=progress2 $SCRATCH/fmriprep-lts $SLURM_TMPDIR
 
-singularity run --cleanenv -B $SLURM_TMPDIR:/WORK -B $HOME/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ /WORK/envs/fmriprep-20.2.1lts.sif -w /WORK/fmriprep_work --participant-label CTS201 --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym --notrack --write-graph --omp-nthreads 8 --nprocs 16 --mem_mb 65536 --resource-monitor /WORK/data/inputs/openneuro/ds000256 /WORK/data/inputs/openneuro/ds000256/derivatives/fmriprep participant 
+singularity run --cleanenv -B $SLURM_TMPDIR/fmriprep-lts:/WORK -B $HOME/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ /WORK/envs/fmriprep-20.2.1lts.sif -w /WORK/fmriprep_work --participant-label CTS201 --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym --notrack --write-graph --omp-nthreads 8 --nprocs 16 --mem_mb 65536 --resource-monitor /WORK/inputs/openneuro/ds000256 /WORK/inputs/openneuro/ds000256/derivatives/fmriprep participant 
 fmriprep_exitcode=$?
 if [ $fmriprep_exitcode -ne 0 ] ; then
-    cp -R $SLURM_TMPDIR/fmriprep_work $SCRATCH/fmriprep_ds000256-sub-CTS201_$SLURM_ARRAY_TASK_ID.workdir
+    cp -R $SLURM_TMPDIR/fmriprep-lts/fmriprep_work $SCRATCH/fmriprep_ds000256-sub-CTS201_$SLURM_ARRAY_TASK_ID.workdir
 fi 
 if [ $fmriprep_exitcode -eq 0 ] ; then
-    cp $SLURM_TMPDIR/fmriprep_work/fmriprep_wf/resource_monitor.json $SCRATCH/fmriprep_ds000256-sub-CTS201_resource_monitor_$SLURM_ARRAY_TASK_ID.json 
-    cp -R $SLURM_TMPDIR/data/inputs/openneuro/ds000256/derivatives/fmriprep $SCRATCH/fmriprep-ds000256_$SLURM_ARRAY_TASK_ID
+    cp $SLURM_TMPDIR/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json $SCRATCH/fmriprep_ds000256-sub-CTS201_resource_monitor_$SLURM_ARRAY_TASK_ID.json 
+    cp -R $SLURM_TMPDIR/fmriprep-lts/inputs/openneuro/ds000256/derivatives/fmriprep $SCRATCH/fmriprep-ds000256_$SLURM_ARRAY_TASK_ID
 fi 
 exit $fmriprep_exitcode 
