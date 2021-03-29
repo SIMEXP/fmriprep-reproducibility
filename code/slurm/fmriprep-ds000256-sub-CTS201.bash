@@ -25,7 +25,7 @@ if [ $fmriprep_exitcode -ne 0 ] ; then
     cp -R $SLURM_TMPDIR/fmriprep-lts/fmriprep_work $SCRATCH/fmriprep_ds000256-sub-CTS201_$SLURM_ARRAY_TASK_ID.workdir
 fi 
 if [ $fmriprep_exitcode -eq 0 ] ; then
-    cp $SLURM_TMPDIR/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json $SCRATCH/fmriprep_ds000256-sub-CTS201_resource_monitor_$SLURM_ARRAY_TASK_ID.json 
     cp -R $SLURM_TMPDIR/fmriprep-lts/inputs/openneuro/ds000256/derivatives/fmriprep $SCRATCH/fmriprep-ds000256_$SLURM_ARRAY_TASK_ID
+    cp $SLURM_TMPDIR/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json $SCRATCH/fmriprep-ds000256_$SLURM_ARRAY_TASK_ID/fmriprep_ds000256-sub-CTS201_resource_monitor_$SLURM_ARRAY_TASK_ID.json 
 fi 
 exit $fmriprep_exitcode 
