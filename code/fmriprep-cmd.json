@@ -1,0 +1,44 @@
+{
+  "ds000256": {
+    "sub-CTS201": [
+      "--participant-label CTS201"
+      ],
+    "sub-CTS210": [
+      "--participant-label CTS210"
+      ]
+  },
+  "ds001748": {
+    "sub-adult15": [
+      "--participant-label CTS201"
+      ],
+    "sub-adult16": [
+      "--participant-label CTS210"
+      ]
+  },
+  "ds002338": {
+    "sub-xp207": [
+      "--participant-label CTS201"
+      ],
+    "sub-xp201": [
+      "--participant-label CTS210"
+      ]
+  },
+  "ds002080": {
+    "sub-PAT23": [
+      "--participant-label CTS201"
+      ],
+    "sub-PAT10": [
+      "--participant-label CTS210"
+      ]
+  },
+    "ds001600": {
+    "sub-1": [
+      "--participant-label 1"
+      ]
+  },
+    "ds001771": {
+      "sub-36": [
+        "--participant-label sub-36"
+        ]
+  }
+}
