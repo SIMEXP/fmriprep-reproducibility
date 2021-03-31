@@ -28,7 +28,7 @@ singularity run --cleanenv -B $SLURM_TMPDIR/fmriprep-lts:/WORK -B $HOME/.cache/t
     --notrack --write-graph --resource-monitor \
     --omp-nthreads 8 --nprocs 16 --mem_mb 65536 \
     --random-seed 0 --fs-no-reconall --participant-label $PARTICIPANT \
-    /WORK/inputs/openneuro/$DATASET /WORK/inputs/openneuro/$DATASET/derivatives/fmriprep participant \
+    /WORK/inputs/openneuro/$DATASET /WORK/inputs/openneuro/$DATASET/derivatives/fmriprep participant
 fmriprep_exitcode=$?
 
 if [ $fmriprep_exitcode -ne 0 ] ; then
