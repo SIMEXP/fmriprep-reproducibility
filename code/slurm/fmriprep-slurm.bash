@@ -13,7 +13,7 @@ PARTICIPANT=$2
 SING_IMG=$3
 
 INPUT_DIR=${SCRATCH}/fmriprep-lts
-OUTPUT_DIR=${INPUT_DIR}/outputs/ieee
+OUTPUT_DIR=${INPUT_DIR}/outputs/ieee/fmriprep_${DATASET}_${SLURM_ARRAY_TASK_ID}
 export SINGULARITYENV_FS_LICENSE=${HOME}/.freesurfer.txt
 export SINGULARITYENV_TEMPLATEFLOW_HOME=/templateflow
 
@@ -36,8 +36,8 @@ if [ $fmriprep_exitcode -ne 0 ] ; then
     cp -R ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}.workdir
 fi 
 if [ $fmriprep_exitcode -eq 0 ] ; then
-    mkdir -p ${OUTPUT_DIR}/fmriprep_${DATASET}_${SLURM_ARRAY_TASK_ID}
-    cp -R ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep ${OUTPUT_DIR}/fmriprep_${DATASET}_${SLURM_ARRAY_TASK_ID}/
-    cp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}/fmriprep_${DATASET}_${SLURM_ARRAY_TASK_ID}/
+    mkdir -p ${OUTPUT_DIR}
+    cp -R ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}
+    cp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}
 fi 
 exit $fmriprep_exitcode 
