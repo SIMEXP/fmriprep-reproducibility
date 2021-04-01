@@ -2,6 +2,7 @@
 
 PROJECT_DIR=../../fmriprep-lts
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
+TEMPLATEFLOW_DIR=/home/$USER/.cache/templateflow
 SING_IMG=fmriprep-20.2.1lts.sif
 FMRIPREP_CONTAINER=$PROJECT_DIR/envs/$SING_IMG
 
@@ -61,10 +62,11 @@ done
 
 
 ######### Download the templateflow templates
+mkdir -p $TEMPLATEFLOW_DIR
 export SINGULARITYENV_TEMPLATEFLOW_HOME=/templateflow
 singularity exec -B $PROJECT_DIR:/WORK \
   -B /etc/pki:/etc/pki \
-  -B /home/$USER/.cache/templateflow:/templateflow \
+  -B $TEMPLATEFLOW_DIR:/templateflow \
   $FMRIPREP_CONTAINER \
   python3 -c """
 from templateflow.api import get;
