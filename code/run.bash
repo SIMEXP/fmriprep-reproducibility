@@ -1,11 +1,12 @@
 #!/bin/bash
 
+echo "Starting process.."
 PROJECT_DIR=../../fmriprep-lts
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
 SING_IMG=fmriprep-20.2.1lts.sif
 FMRIPREP_CONTAINER=$PROJECT_DIR/envs/$SING_IMG
 # user variables
-TEST=false # whether to print the commands or launch them
+SUBMIT=false # whether to launch the jobs or just print the commands
 SLURM=false # whether to submit slurm jobs or raw cmd
 ACCOUNT= # slurm account name
 MAIL_USER= # mail for job status
@@ -16,8 +17,8 @@ do
 key="$1"
 
 case $key in
-    --test)
-    TEST=true
+    --submit)
+    SUBMIT=true
     shift # past argument
     ;;
     --slurm)
@@ -37,10 +38,7 @@ case $key in
 esac
 done
 
-echo "TEST = ${TEST}"
-echo "SLURM = ${SLURM}"
-echo "ACCOUNT = ${ACCOUNT}"
-echo "MAIL_USER = ${MAIL_USER}"
+echo "./run.bash "$@
 
 # read all dataset keys
 DATASET_KEYS=($(singularity exec -B $PROJECT_DIR:/WORK $FMRIPREP_CONTAINER \
@@ -90,11 +88,11 @@ EOM
 EOM
         fi
         # print command
-        if [ "$TEST" = true ] ; then
-            echo $CMD
+        if [ "$SUBMIT" = true ] ; then
+            $CMD
         # execute command
         else
-            $CMD
+            echo $CMD
         fi
     done
 done
