@@ -1,6 +1,8 @@
 #!/bin/bash
 
 echo "Starting process.."
+echo "./run.bash "$@
+
 PROJECT_DIR=../../fmriprep-lts
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
 SING_IMG=fmriprep-20.2.1lts.sif
@@ -37,8 +39,6 @@ case $key in
     ;;
 esac
 done
-
-echo "./run.bash "$@
 
 # read all dataset keys
 DATASET_KEYS=($(singularity exec -B $PROJECT_DIR:/WORK $FMRIPREP_CONTAINER \
