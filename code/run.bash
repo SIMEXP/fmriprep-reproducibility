@@ -1,7 +1,8 @@
 #!/bin/bash
 
-echo "Starting process.."
 echo "./run.bash "$@
+echo "Starting process.."
+echo ""
 
 PROJECT_DIR=../../fmriprep-lts
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
