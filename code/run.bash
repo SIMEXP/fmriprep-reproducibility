@@ -94,6 +94,7 @@ EOM
         # execute command
         else
             echo $CMD
+            echo ""
         fi
     done
 done
