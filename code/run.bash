@@ -73,13 +73,14 @@ print(list_keys)
     do
         # slurm cmd
         if [ "$SLURM" = true ] ; then
+            mkdir -p /scratch/$USER/.slurm
             read -r -d '' CMD <<- EOM
                 sbatch
                 --account=$ACCOUNT
                 --job-name=fmriprep_$DATASET-$PARTICIPANT_%A_%a.job
                 --mail-user=$MAIL_USER
-                --output=/scratch/%u/fmriprep_$DATASET-$PARTICIPANT_%A_%a.out
-                --error=/scratch/%u/fmriprep_$DATASET-$PARTICIPANT_%A_%a.err
+                --output=/scratch/%u/.slurm/fmriprep_$DATASET-$PARTICIPANT_%A_%a.out
+                --error=/scratch/%u/.slurm/fmriprep_$DATASET-$PARTICIPANT_%A_%a.err
                 slurm/fmriprep-slurm.bash $DATASET $PARTICIPANT $SING_IMG
 EOM
         # raw cmd
