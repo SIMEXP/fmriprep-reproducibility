@@ -10,9 +10,10 @@
 
 DATASET=$1
 PARTICIPANT=$2
+SING_IMG=$3
+
 INPUT_DIR=${SCRATCH}/fmriprep-lts
 OUTPUT_DIR=${INPUT_DIR}/outputs/ieee
-SING_IMG=fmriprep-20.2.1lts.sif
 export SINGULARITYENV_FS_LICENSE=${HOME}/.freesurfer.txt
 export SINGULARITYENV_TEMPLATEFLOW_HOME=/templateflow
 

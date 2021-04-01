@@ -2,7 +2,8 @@
 
 PROJECT_DIR=../../fmriprep-lts
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
-FMRIPREP_CONTAINER=$PROJECT_DIR/envs/fmriprep-20.2.1lts.sif
+SING_IMG=fmriprep-20.2.1lts.sif
+FMRIPREP_CONTAINER=$PROJECT_DIR/envs/$SING_IMG
 # user variables
 TEST=false # whether to print the commands or launch them
 SLURM=false # whether to submit slurm jobs or raw cmd
@@ -57,7 +58,7 @@ for DATASET in ${DATASET_KEYS[@]}
 do
     # read all participant keys
     export SINGULARITYENV_DATASET=$DATASET
-	PARTICIPANT_KEYS=($(singularity exec -B $PROJECT_DIR:/WORK $FMRIPREP_CONTAINER \
+    PARTICIPANT_KEYS=($(singularity exec -B $PROJECT_DIR:/WORK $FMRIPREP_CONTAINER \
       python3 -c """
 import os
 import json
@@ -79,7 +80,7 @@ print(list_keys)
                 --mail-user=$MAIL_USER
                 --output=/scratch/%u/fmriprep_$DATASET-$PARTICIPANT_%A_%a.out
                 --error=/scratch/%u/fmriprep_$DATASET-$PARTICIPANT_%A_%a.err
-                slurm/fmriprep-slurm.bash $DATASET $PARTICIPANT
+                slurm/fmriprep-slurm.bash $DATASET $PARTICIPANT $SING_IMG
 EOM
         # raw cmd
         else

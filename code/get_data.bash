@@ -2,7 +2,8 @@
 
 PROJECT_DIR=../../fmriprep-lts
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
-FMRIPREP_CONTAINER=$PROJECT_DIR/envs/fmriprep-20.2.1lts.sif
+SING_IMG=fmriprep-20.2.1lts.sif
+FMRIPREP_CONTAINER=$PROJECT_DIR/envs/$SING_IMG
 
 ######### Get the raw data
 ## Age
