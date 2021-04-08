@@ -28,7 +28,7 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
     --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym \
     --notrack --write-graph --resource-monitor \
     --omp-nthreads 8 --nprocs 16 --mem_mb 65536 \
-    --random-seed 0 --participant-label ${PARTICIPANT} --fs-no-reconall \
+    --random-seed 0 --participant-label ${PARTICIPANT} \
     /WORK/inputs/openneuro/${DATASET} /WORK/inputs/openneuro/${DATASET}/derivatives/fmriprep participant
 fmriprep_exitcode=$?
 
