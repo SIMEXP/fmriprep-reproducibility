@@ -80,7 +80,7 @@ print(list_keys)
                 --mail-user=$MAIL_USER
                 --output=/scratch/%u/.slurm/fmriprep_$DATASET-$PARTICIPANT_%A_%a.out
                 --error=/scratch/%u/.slurm/fmriprep_$DATASET-$PARTICIPANT_%A_%a.err
-                slurm/fmriprep-slurm-func_anat.bash $DATASET $PARTICIPANT $SING_IMG
+                slurm/fmriprep-slurm-anat_func.bash $DATASET $PARTICIPANT $SING_IMG
 EOM
         # raw cmd
         else
