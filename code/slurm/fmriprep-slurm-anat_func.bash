@@ -28,9 +28,9 @@ rsync -rltv --info=progress2 ${INPUT_DIR} ${SLURM_TMPDIR}
 
 singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ \
     ${SLURM_TMPDIR}/fmriprep-lts/envs/${SING_IMG} \
-    -w /WORK/fmriprep_work --anat-only \
+    -w /WORK/fmriprep_work \
     --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym \
-    --notrack --write-graph --resource-monitor \
+    --anat-only --notrack --write-graph --resource-monitor \
     --omp-nthreads 1 --nprocs 1 --mem_mb 65536 \
     --random-seed 0 --participant-label ${PARTICIPANT} \
     /WORK/inputs/openneuro/${DATASET} /WORK/inputs/openneuro/${DATASET}/derivatives/fmriprep participant
