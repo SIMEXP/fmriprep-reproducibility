@@ -32,7 +32,7 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
     --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym \
     --anat-only --notrack --write-graph --resource-monitor \
     --omp-nthreads 1 --nprocs 1 --mem_mb 65536 \
-    --random-seed 0 --participant-label ${PARTICIPANT} \
+    --participant-label ${PARTICIPANT} --random-seed 0 \
     /WORK/inputs/openneuro/${DATASET} /WORK/inputs/openneuro/${DATASET}/derivatives/fmriprep participant
 fmriprep_exitcode=$?
 
@@ -60,7 +60,7 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
     --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym \
     --notrack --write-graph --resource-monitor \${SLURM_ARRAY_TASK_ID}
     --omp-nthreads 1 --nprocs 1 --mem_mb 65536 \
-    --random-seed 0 --participant-label ${PARTICIPANT} \
+    --participant-label ${PARTICIPANT} --random-seed 0 \
     /WORK/inputs/openneuro/${DATASET} /WORK/inputs/openneuro/${DATASET}/derivatives/fmriprep participant
 fmriprep_exitcode=$?
 
