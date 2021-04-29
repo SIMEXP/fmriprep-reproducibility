@@ -56,7 +56,7 @@ rsync -rltv --info=progress2 ${ANAT_DATASET_1} ${SLURM_TMPDIR}/fmriprep-lts/outp
 
 singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ \
     ${SLURM_TMPDIR}/fmriprep-lts/envs/${SING_IMG} \
-    -w /WORK/fmriprep_work --anat-derivatives /WORK/outputs/ieee/fmriprep_${DATASET}_1_anat/fmriprep/fmriprep/${PARTICIPANT}/anat \
+    -w /WORK/fmriprep_work --anat-derivatives /WORK/outputs/ieee/fmriprep_${DATASET}_1_anat/fmriprep/${PARTICIPANT}/anat \
     --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym \
     --notrack --write-graph --resource-monitor \${SLURM_ARRAY_TASK_ID}
     --omp-nthreads 1 --nprocs 1 --mem_mb 65536 \
