@@ -51,8 +51,8 @@ fi
 ###
 
 # wait for first anat iteration of current dataset to be ready, and then copy it
-while [ ! -f ${OUTPUT_DIR}_anat/${DATASET}_1_finished ]; do sleep 1; done
 ANAT_DATASET_1=${INPUT_DIR}/outputs/ieee/fmriprep_${DATASET}_1_anat
+while [ ! -f ${ANAT_DATASET_1}/${DATASET}_1_finished ]; do sleep 1; done
 rsync -rltv --info=progress2 ${ANAT_DATASET_1} ${SLURM_TMPDIR}/fmriprep-lts/outputs/ieee/
 
 singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ \
