@@ -43,15 +43,16 @@ if [ $fmriprep_exitcode -eq 0 ] ; then
     mkdir -p ${OUTPUT_DIR}_anat
     cp -R ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_anat
     cp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_anat
+    touch ${OUTPUT_DIR}_anat/${DATASET}_${SLURM_ARRAY_TASK_ID}_finished
 fi
 
 ###
 # Second batch, func only (and anat stays the same among each iteration)
 ###
 
-# wait for first iteration of current dataset to be ready, and then copy it
+# wait for first anat iteration of current dataset to be ready, and then copy it
+while [ ! -f ${OUTPUT_DIR}_anat/${DATASET}_1_finished ]; do sleep 1; done
 ANAT_DATASET_1=${INPUT_DIR}/outputs/ieee/fmriprep_${DATASET}_1_anat
-while [ ! -d ${ANAT_DATASET_1} ]; do sleep 1; done
 rsync -rltv --info=progress2 ${ANAT_DATASET_1} ${SLURM_TMPDIR}/fmriprep-lts/outputs/ieee/
 
 singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ \
