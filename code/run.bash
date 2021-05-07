@@ -76,10 +76,10 @@ print(list_keys)
             read -r -d '' CMD <<- EOM
                 sbatch
                 --account=$ACCOUNT
-                --job-name=fmriprep_$DATASET-$PARTICIPANT_%A_%a.job
+                --job-name=fmriprep_${DATASET}-${PARTICIPANT}_%A_%a.job
                 --mail-user=$MAIL_USER
-                --output=/scratch/%u/.slurm/fmriprep_$DATASET-$PARTICIPANT_%A_%a.out
-                --error=/scratch/%u/.slurm/fmriprep_$DATASET-$PARTICIPANT_%A_%a.err
+                --output=/scratch/%u/.slurm/fmriprep_${DATASET}-${PARTICIPANT}_%A_%a.out
+                --error=/scratch/%u/.slurm/fmriprep_${DATASET}-${PARTICIPANT}_%A_%a.err
                 slurm/fmriprep-slurm-anat_func.bash $DATASET $PARTICIPANT $SING_IMG
 EOM
         # raw cmd
