@@ -20,7 +20,7 @@ export SINGULARITYENV_TEMPLATEFLOW_HOME=/templateflow
 module load singularity/3.6
 
 #copying input dataset into local scratch space
-rsync -rltv --info=progress2 ${INPUT_DIR} ${SLURM_TMPDIR}
+rsync -rltv --info=progress2 --exclude "outputs" --exclude "code" ${INPUT_DIR} ${SLURM_TMPDIR}
 
 ###
 # First batch, anat only
@@ -37,13 +37,13 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
 fmriprep_exitcode=$?
 
 if [ $fmriprep_exitcode -ne 0 ] ; then
-    cp -R ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_anat.workdir
+    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_anat.workdir
 fi 
 if [ $fmriprep_exitcode -eq 0 ] ; then
     mkdir -p ${OUTPUT_DIR}_anat
-    cp -R ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_anat
-    cp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_anat
-    touch ${OUTPUT_DIR}_anat/${DATASET}_${SLURM_ARRAY_TASK_ID}_finished
+    mv ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_anat
+    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_anat
+    touch ${OUTPUT_DIR}_anat/${DATASET}_${SLURM_ARRAY_TASK_ID}_${PARTICIPANT}_finished
 fi
 
 ###
@@ -52,7 +52,7 @@ fi
 
 # wait for first anat iteration of current dataset to be ready, and then copy it
 ANAT_DATASET_1=${INPUT_DIR}/outputs/ieee/fmriprep_${DATASET}_1_anat
-while [ ! -f ${ANAT_DATASET_1}/${DATASET}_1_finished ]; do sleep 1; done
+while [ ! -f ${ANAT_DATASET_1}/${DATASET}_1_${PARTICIPANT}_finished ]; do sleep 1; done
 rsync -rltv --info=progress2 ${ANAT_DATASET_1} ${SLURM_TMPDIR}/fmriprep-lts/outputs/ieee/
 
 singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ \
@@ -67,12 +67,12 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
 fmriprep_exitcode=$?
 
 if [ $fmriprep_exitcode -ne 0 ] ; then
-    cp -R ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_func.workdir
+    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_func.workdir
 fi 
 if [ $fmriprep_exitcode -eq 0 ] ; then
     mkdir -p ${OUTPUT_DIR}_func
-    cp -R ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_func
-    cp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_func
+    mv ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_func
+    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_func
 fi
 
 exit $fmriprep_exitcode 
