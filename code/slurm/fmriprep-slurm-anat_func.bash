@@ -17,7 +17,15 @@ OUTPUT_DIR=${INPUT_DIR}/outputs/ieee/fmriprep_${DATASET}_${SLURM_ARRAY_TASK_ID}
 export SINGULARITYENV_FS_LICENSE=${HOME}/.freesurfer.txt
 export SINGULARITYENV_TEMPLATEFLOW_HOME=/templateflow
 
+ANAT_DATASET_1=${INPUT_DIR}/outputs/ieee/fmriprep_${DATASET}_1_anat
+ANAT_1_FINISHED=${ANAT_DATASET_1}/${DATASET}_1_${PARTICIPANT}_finished
+
 module load singularity/3.6
+
+# remove first anat flag if exists
+if [ -f ${ANAT_1_FINISHED} ]; then
+    rm ${ANAT_1_FINISHED}
+fi
 
 #copying input dataset into local scratch space
 rsync -rltv --info=progress2 --exclude "outputs" --exclude "code" ${INPUT_DIR} ${SLURM_TMPDIR}
@@ -51,8 +59,7 @@ fi
 ###
 
 # wait for first anat iteration of current dataset to be ready, and then copy it
-ANAT_DATASET_1=${INPUT_DIR}/outputs/ieee/fmriprep_${DATASET}_1_anat
-while [ ! -f ${ANAT_DATASET_1}/${DATASET}_1_${PARTICIPANT}_finished ]; do sleep 1; done
+while [ ! -f ${ANAT_1_FINISHED} ]; do sleep 1; done
 mkdir -p ${SLURM_TMPDIR}/fmriprep-lts/outputs/ieee/
 rsync -rltv --info=progress2 ${ANAT_DATASET_1} ${SLURM_TMPDIR}/fmriprep-lts/outputs/ieee/
 
