@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --array=1-5
-#SBATCH --time=24:00:00
+#SBATCH --time=36:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=8000M
 #SBATCH --mail-type=BEGIN
@@ -33,11 +33,11 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
 fmriprep_exitcode=$?
 
 if [ $fmriprep_exitcode -ne 0 ] ; then
-    cp -R ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}.workdir
+    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}.workdir
 fi 
 if [ $fmriprep_exitcode -eq 0 ] ; then
     mkdir -p ${OUTPUT_DIR}
-    cp -R ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}
-    cp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}
+    mv ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}
+    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}
 fi 
 exit $fmriprep_exitcode 

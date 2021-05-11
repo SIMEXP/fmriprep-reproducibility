@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --array=1-5
-#SBATCH --time=24:00:00
+#SBATCH --time=36:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=8000M
 #SBATCH --mail-type=BEGIN
