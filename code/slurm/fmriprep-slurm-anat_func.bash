@@ -45,14 +45,16 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
 fmriprep_exitcode=$?
 
 if [ $fmriprep_exitcode -ne 0 ] ; then
-    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_anat.workdir
+    cp -r ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_anat.workdir
 fi 
 if [ $fmriprep_exitcode -eq 0 ] ; then
     mkdir -p ${OUTPUT_DIR}_anat
-    mv ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_anat
-    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_anat
+    cp -r ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_anat
+    rm -r ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/*
+    cp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_anat
     touch ${OUTPUT_DIR}_anat/${DATASET}_${SLURM_ARRAY_TASK_ID}_${PARTICIPANT}_finished
 fi
+rm -r ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work
 
 ###
 # Second batch, func only (and anat stays the same among each iteration)
@@ -75,12 +77,14 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
 fmriprep_exitcode=$?
 
 if [ $fmriprep_exitcode -ne 0 ] ; then
-    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_func.workdir
+    cp -r ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_func.workdir
 fi 
 if [ $fmriprep_exitcode -eq 0 ] ; then
     mkdir -p ${OUTPUT_DIR}_func
-    mv ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_func
-    mv ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_func
+    cp -r ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_func
+    rm -r ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/*
+    cp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_func
 fi
+rm -r ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work
 
 exit $fmriprep_exitcode 
