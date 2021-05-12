@@ -2,3 +2,7 @@
 	path = inputs/openneuro
 	url = http://datasets.datalad.org/openneuro/.git
 	datalad-id = 2ecbb6ba-f811-11e8-b1ed-002590f97d84
+[submodule "envs/singularity-images"]
+	path = envs/singularity-images
+	url = ./envs/singularity-images
+	datalad-id = f1985003-afb4-4bf2-80d0-7139f890d4c2
