@@ -2,7 +2,7 @@
 
 ## Usage
 
-Singularity images are available in sub-dataset `singularity-images` stored on OSF at https://osf.io/wvz3e. The sub-dataset can be installed as follows:
+Singularity images are available in sub-dataset `singularity-images` stored on OSF at https://osf.io/rbu92. The sub-dataset can be installed as follows:
 
 ```
 datalad install envs/container-images
