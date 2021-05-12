@@ -2,7 +2,3 @@
 	path = inputs/openneuro
 	url = http://datasets.datalad.org/openneuro/.git
 	datalad-id = 2ecbb6ba-f811-11e8-b1ed-002590f97d84
-[submodule "envs/container-images"]
-	path = envs/container-images
-	url = ./envs/container-images
-	datalad-id = c0b00e7c-2f04-4e4b-bd43-4dedbd9b51e6
