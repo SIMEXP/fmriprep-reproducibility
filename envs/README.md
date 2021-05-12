@@ -2,34 +2,43 @@
 
 ## Usage
 
-* Preparation
+Singularity images are available in sub-dataset `container-images` stored on OSF at https://osf.io/wvz3e. The sub-dataset can be installed as follows:
 
-Get the Singularity image file using datalad
+```
+datalad install envs/container-images
+```
 
-...
+The Singularity image can be downloaded as follows:
+```
+datalad get envs/container-images/fmriprep-lts.sif
+```
 
-* Default mode
-
+And it can be used as follows:
 ```
 singularity run ./fmriprep-lts.sif <args>
 ```
 
-* Fuzzy mode
+## Fuzzy mode
 
+fmriprep can be executed in "fuzzy" mode from the same image:
 ```
 FUZZY=true singularity run ./fmriprep-lts.sif <args>
 ```
 
-## Build
+This mode simulates machine error by introducing random perturbations in the results of mathematical functions. It is used to build a reference variability map in the tests.
 
-Pre-requisites
+## Building images
+
+The Singularity image is built from the official fmriprep Docker image. Building the image requires local installations of:
 * Docker
 * Singularity >= 3.5
 
-`build.sh` builds `fmriprep-lts.sif`:
-* Build a Docker image adding fuzzy libmath to a base fmriprep image.
-* Convert this image to Singularity
-* Push this image to OSF (WIP)
+The image is built by running `build.sh` from the base directory of this repo.
+
+Once they are built, images can be pushed to OSF as follows:
+```
+OSF_TOKEN=<your_personal_token> git-annex export HEAD --to osf-export-storage
+```
 
 
 
