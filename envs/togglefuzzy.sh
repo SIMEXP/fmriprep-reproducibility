@@ -2,7 +2,7 @@
 
 set -e
 
-if [ -v FUZZY ]
+if [ -v FUZZY ] && [ $FUZZY == "true" ]
 then
     LIB_WRAP='/lib/fuzzy/docker/resources/libmath/libmath.so'
     test -f ${LIB_WRAP} || (echo "ERROR: cannot find ${LIB_WRAP}" && false)
@@ -10,5 +10,5 @@ then
     echo "Preloaded ${LIB_WRAP}"
 fi
 
-# Run initial command line
-$*
+# Run initial entrypoint
+/usr/local/miniconda/bin/fmriprep $*
