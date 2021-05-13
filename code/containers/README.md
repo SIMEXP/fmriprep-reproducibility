@@ -20,9 +20,9 @@ singularity run ./fmriprep-lts.sif <args>
 
 ## Fuzzy mode
 
-fmriprep can be executed in "fuzzy" mode from the same image:
+fmriprep can be executed in "fuzzy" mode as follows:
 ```
-FUZZY=true singularity run ./fmriprep-lts.sif <args>
+singularity run ./fmriprep-lts-fuzzy.sif <args>
 ```
 
 This mode simulates machine error by introducing random perturbations in the results of mathematical functions. It is used to build a reference variability map in the tests.

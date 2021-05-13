@@ -12,8 +12,7 @@ FROM poldracklab/fmriprep:${fmriprep_version}
 RUN mkdir -p /opt/mca-libmath
 COPY --from=fuzzy /opt/mca-libmath/libmath.so /opt/mca-libmath/
 COPY --from=fuzzy /usr/local/lib/libinterflop* /usr/local/lib/
-ENV VFC_BACKENDS 'libinterflop_mca.so --precision-binary32=24 --precision-binary64=53 --mode=mca'
 
-# An entrypoint to toggle the fuzzy environment
-COPY envs/togglefuzzy.sh /bin/
-ENTRYPOINT togglefuzzy.sh
+# Set environment variables
+ENV VFC_BACKENDS 'libinterflop_mca.so --precision-binary32=24 --precision-binary64=53 --mode=mca'
+ENV LD_PRELOAD '/opt/mca-libmath/libmath.so'
