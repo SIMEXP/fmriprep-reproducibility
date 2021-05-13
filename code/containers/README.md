@@ -37,7 +37,7 @@ The image is built by running `build.sh` from the base directory of this repo.
 
 Once they are built, images can be pushed to OSF as follows:
 ```
-OSF_TOKEN=<your_personal_token> git-annex export HEAD --to osf-export-storage
+OSF_TOKEN=<your_personal_token> datalad push --to github
 ```
 
 
