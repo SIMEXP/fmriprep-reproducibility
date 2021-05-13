@@ -23,14 +23,6 @@
       "--participant-label CTS210"
       ]
   },
-  "ds002080": {
-    "sub-PAT23": [
-      "--participant-label CTS201"
-      ],
-    "sub-PAT10": [
-      "--participant-label CTS210"
-      ]
-  },
     "ds001600": {
     "sub-1": [
       "--participant-label 1"
