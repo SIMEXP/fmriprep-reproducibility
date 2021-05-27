@@ -1,10 +1,11 @@
 #!/bin/bash
 
-PROJECT_DIR=../../fmriprep-lts
+SCRIPT_DIR=$(readlink -e $(dirname $0))
+PROJECT_DIR=$SCRIPT_DIR/../
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
 TEMPLATEFLOW_DIR=/home/$USER/.cache/templateflow
 SING_IMG=fmriprep-20.2.1lts.sif
-FMRIPREP_CONTAINER=$PROJECT_DIR/envs/$SING_IMG
+FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
 
 ######### Get the raw data
 ## Age
@@ -25,6 +26,9 @@ FMRIPREP_CONTAINER=$PROJECT_DIR/envs/$SING_IMG
 # T2w
 # SBref
 # ds001771/sub-36
+
+# get singularity images
+datalad get envs/singularity-images/fmriprep-lts*
 
 # read all dataset keys
 DATASET_KEYS=($(singularity exec -B $PROJECT_DIR:/WORK $FMRIPREP_CONTAINER \

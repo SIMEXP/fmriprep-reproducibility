@@ -4,10 +4,11 @@ echo "./run.bash "$@
 echo "Starting process.."
 echo ""
 
-PROJECT_DIR=../../fmriprep-lts
+SCRIPT_DIR=$(readlink -e $(dirname $0))
+PROJECT_DIR=$SCRIPT_DIR/../
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
 SING_IMG=fmriprep-20.2.1lts.sif
-FMRIPREP_CONTAINER=$PROJECT_DIR/envs/$SING_IMG
+FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
 # user variables
 SUBMIT=false # whether to launch the jobs or just print the commands
 SLURM=false # whether to submit slurm jobs or raw cmd
