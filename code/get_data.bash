@@ -28,7 +28,7 @@ FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
 # ds001771/sub-36
 
 # get singularity images
-datalad get envs/singularity-images/fmriprep-lts*
+datalad get $PROJECT_DIR/envs/singularity-images/fmriprep-lts*
 
 # read all dataset keys
 DATASET_KEYS=($(singularity exec -B $PROJECT_DIR:/WORK $FMRIPREP_CONTAINER \
