@@ -4,16 +4,18 @@ echo "./run.bash "$@
 echo "Starting process.."
 echo ""
 
+# user parameters
+SUBMIT=false # whether to launch the jobs or just print the commands
+SLURM=false # whether to submit slurm jobs or raw cmd
+SLURM_SCRIPT="fmriprep-slurm.bash" # slurm script name
+SING_IMG="fmriprep-lts-20.2.1.sif" # fmriprep version
+ACCOUNT= # slurm account name
+MAIL_USER= # mail for job status
+# paths
 SCRIPT_DIR=$(readlink -e $(dirname $0))
 PROJECT_DIR=$SCRIPT_DIR/../
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
-SING_IMG=fmriprep-20.2.1lts.sif
 FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
-# user variables
-SUBMIT=false # whether to launch the jobs or just print the commands
-SLURM=false # whether to submit slurm jobs or raw cmd
-ACCOUNT= # slurm account name
-MAIL_USER= # mail for job status
 
 # argument parser
 while [[ $# -gt 0 ]]
@@ -28,6 +30,17 @@ case $key in
     --slurm)
     SLURM=true
     shift # past argument
+    ;;
+    --slurm-script)
+    SLURM_SCRIPT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    --fmriprep-version)
+    SING_IMG="fmriprep-lts-$2.sif" # fmriprep version
+    FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
+    shift # past argument
+    shift # past value
     ;;
     -a|--account)
     ACCOUNT="$2"
@@ -81,7 +94,7 @@ print(list_keys)
                 --mail-user=$MAIL_USER
                 --output=/scratch/%u/.slurm/fmriprep_${DATASET}-${PARTICIPANT}_%A_%a.out
                 --error=/scratch/%u/.slurm/fmriprep_${DATASET}-${PARTICIPANT}_%A_%a.err
-                slurm/fmriprep-slurm-anat_func.bash $DATASET $PARTICIPANT $SING_IMG
+                ${PROJECT_DIR}/code/slurm/${SLURM_SCRIPT} ${DATASET} ${PARTICIPANT} ${SING_IMG}
 EOM
         # raw cmd
         else
