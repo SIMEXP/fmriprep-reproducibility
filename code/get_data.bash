@@ -28,6 +28,10 @@ FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
 # ds001771/sub-36
 
 # get singularity images
+curr_dir=$(pwd)
+cd $PROJECT_DIR/envs/singularity-images/
+git annex enableremote osf-annex2-storage
+cd $curr_dir
 datalad get $PROJECT_DIR/envs/singularity-images/fmriprep-lts*
 
 # read all dataset keys
