@@ -21,10 +21,10 @@ function docker2singularity(){
     
 }
 
-FMRIPREP_VERSION=20.2.0
+FMRIPREP_VERSION=20.2.1
 
 # Build regular (non-fuzzy) image from Poldrack lab Docker image
-docker2singularity poldracklab/fmriprep:${FMRIPREP_VERSION} fmriprep-lts-${FMRIPREP_VERSION}
+docker2singularity nipreps/fmriprep:${FMRIPREP_VERSION} fmriprep-lts-${FMRIPREP_VERSION}
 
 # Build fuzzy image
 docker build . --build-arg fmriprep_version=${FMRIPREP_VERSION} -f ${DOCKERFILE_DIR}/Dockerfile -t fmriprep-lts-fuzzy:${FMRIPREP_VERSION}
