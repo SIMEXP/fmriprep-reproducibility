@@ -6,7 +6,7 @@ ARG fmriprep_version
 FROM verificarlo/fuzzy:v0.4.1-lapack as fuzzy
 
 # Base image
-FROM poldracklab/fmriprep:${fmriprep_version}
+FROM nipreps/fmriprep:${fmriprep_version}
 
 # Copy fuzzy environment from fuzzy image
 RUN mkdir -p /opt/mca-libmath
