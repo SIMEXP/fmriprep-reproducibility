@@ -1,11 +1,20 @@
 #!/bin/bash
 
+CURR_DIR=$(pwd)
 SCRIPT_DIR=$(readlink -e $(dirname $0))
-PROJECT_DIR=$SCRIPT_DIR/../
+PROJECT_DIR=..
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
 TEMPLATEFLOW_DIR=/home/$USER/.cache/templateflow
 SING_IMG=fmriprep-lts-20.2.1.sif
 FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
+
+cd $SCRIPT_DIR
+
+######### Get the containers
+cd $PROJECT_DIR/envs/singularity-images/
+git annex enableremote osf-annex2-storage
+cd $SCRIPT_DIR
+datalad get $PROJECT_DIR/envs/singularity-images/fmriprep-lts*
 
 ######### Get the raw data
 ## Age
@@ -26,13 +35,6 @@ FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
 # T2w
 # SBref
 # ds001771/sub-36
-
-# get singularity images
-curr_dir=$(pwd)
-cd $PROJECT_DIR/envs/singularity-images/
-git annex enableremote osf-annex2-storage
-cd $curr_dir
-datalad get $PROJECT_DIR/envs/singularity-images/fmriprep-lts*
 
 # read all dataset keys
 DATASET_KEYS=($(singularity exec -B $PROJECT_DIR:/WORK $FMRIPREP_CONTAINER \
@@ -66,9 +68,6 @@ print(list_keys)
     done
 done
 
-######### Get the container
-
-
 ######### Download the templateflow templates
 mkdir -p $TEMPLATEFLOW_DIR
 export SINGULARITYENV_TEMPLATEFLOW_HOME=/templateflow
@@ -80,3 +79,5 @@ singularity exec -B $PROJECT_DIR:/WORK \
 from templateflow.api import get;
 get(['MNI152NLin2009cAsym', 'MNI152NLin6Asym'])
 """
+
+cd $CURR_DIR
