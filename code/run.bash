@@ -13,7 +13,7 @@ ACCOUNT= # slurm account name
 MAIL_USER= # mail for job status
 # paths
 SCRIPT_DIR=$(readlink -e $(dirname $0))
-PROJECT_DIR=$SCRIPT_DIR/../
+PROJECT_DIR=$SCRIPT_DIR/..
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
 FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
 
