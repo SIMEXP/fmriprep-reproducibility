@@ -11,6 +11,10 @@ SLURM_SCRIPT="fmriprep-slurm.bash" # slurm script name
 SING_IMG="fmriprep-lts-20.2.1.sif" # fmriprep version
 ACCOUNT= # slurm account name
 MAIL_USER= # mail for job status
+METHOD=ieee
+if [ $(echo $SING_IMG | grep fuzzy) ] ; then
+    METHOD=fuzzy
+fi
 # paths
 SCRIPT_DIR=$(readlink -e $(dirname $0))
 PROJECT_DIR=$SCRIPT_DIR/..
@@ -90,10 +94,10 @@ print(list_keys)
             read -r -d '' CMD <<- EOM
                 sbatch
                 --account=$ACCOUNT
-                --job-name=fmriprep_${DATASET}-${PARTICIPANT}_%A_%a.job
+                --job-name=fmriprep_${METHOD}_${DATASET}-${PARTICIPANT}_%A_%a.job
                 --mail-user=$MAIL_USER
-                --output=/scratch/%u/.slurm/fmriprep_${DATASET}-${PARTICIPANT}_%A_%a.out
-                --error=/scratch/%u/.slurm/fmriprep_${DATASET}-${PARTICIPANT}_%A_%a.err
+                --output=/scratch/%u/.slurm/fmriprep_${METHOD}_${DATASET}-${PARTICIPANT}_%A_%a.out
+                --error=/scratch/%u/.slurm/fmriprep_${METHOD}_${DATASET}-${PARTICIPANT}_%A_%a.err
                 ${PROJECT_DIR}/code/slurm/${SLURM_SCRIPT} ${DATASET} ${PARTICIPANT} ${SING_IMG}
 EOM
         # raw cmd
