@@ -13,7 +13,11 @@ PARTICIPANT=$2
 SING_IMG=$3
 
 INPUT_DIR=${SCRATCH}/fmriprep-lts
-OUTPUT_DIR=${INPUT_DIR}/outputs/ieee/fmriprep_${DATASET}_${SLURM_ARRAY_TASK_ID}
+METHOD=ieee
+if [ $(echo $SING_IMG | grep fuzzy) ] ; then
+    METHOD=fuzzy
+fi
+OUTPUT_DIR=${INPUT_DIR}/outputs/${METHOD}/fmriprep_${DATASET}_${SLURM_ARRAY_TASK_ID}
 export SINGULARITYENV_FS_LICENSE=${HOME}/.freesurfer.txt
 export SINGULARITYENV_TEMPLATEFLOW_HOME=/templateflow
 
@@ -32,9 +36,7 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
     /WORK/inputs/openneuro/${DATASET} /WORK/inputs/openneuro/${DATASET}/derivatives/fmriprep participant
 fmriprep_exitcode=$?
 
-if [ $fmriprep_exitcode -ne 0 ] ; then
-    cp -r ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${SCRATCH}/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}.workdir
-fi 
+cp -r ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${OUTPUT_DIR}/fmriprep_${METHOD}_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}.workdir
 if [ $fmriprep_exitcode -eq 0 ] ; then
     mkdir -p ${OUTPUT_DIR}
     cp -r ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}
