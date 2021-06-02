@@ -23,7 +23,7 @@ module load singularity/3.6
 rsync -rltv --info=progress2 ${INPUT_DIR} ${SLURM_TMPDIR}
 
 singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ \
-    ${SLURM_TMPDIR}/fmriprep-lts/envs/${SING_IMG} \
+    ${SLURM_TMPDIR}/fmriprep-lts/envs/singularity-images/${SING_IMG} \
     -w /WORK/fmriprep_work \
     --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym \
     --notrack --write-graph --resource-monitor \

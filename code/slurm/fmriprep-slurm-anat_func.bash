@@ -35,7 +35,7 @@ rsync -rltv --info=progress2 --exclude "outputs" --exclude "code" ${INPUT_DIR} $
 ###
 
 singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ \
-    ${SLURM_TMPDIR}/fmriprep-lts/envs/${SING_IMG} \
+    ${SLURM_TMPDIR}/fmriprep-lts/envs/singularity-images/${SING_IMG} \
     -w /WORK/fmriprep_work \
     --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym \
     --anat-only --notrack --write-graph --resource-monitor \
@@ -64,7 +64,7 @@ mkdir -p ${SLURM_TMPDIR}/fmriprep-lts/outputs/ieee/
 rsync -rltv --info=progress2 ${ANAT_DATASET_1} ${SLURM_TMPDIR}/fmriprep-lts/outputs/ieee/
 
 singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ \
-    ${SLURM_TMPDIR}/fmriprep-lts/envs/${SING_IMG} \
+    ${SLURM_TMPDIR}/fmriprep-lts/envs/singularity-images/${SING_IMG} \
     -w /WORK/fmriprep_work \
     --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym \
     --anat-derivatives /WORK/outputs/ieee/fmriprep_${DATASET}_1_anat/fmriprep/${PARTICIPANT}/anat \
