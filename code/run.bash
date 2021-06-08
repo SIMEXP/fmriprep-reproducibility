@@ -8,13 +8,8 @@ echo ""
 SUBMIT=false # whether to launch the jobs or just print the commands
 SLURM=false # whether to submit slurm jobs or raw cmd
 SLURM_SCRIPT="fmriprep-slurm.bash" # slurm script name
-SING_IMG="fmriprep-lts-20.2.1.sif" # fmriprep version
-ACCOUNT= # slurm account name
-MAIL_USER= # mail for job status
-METHOD=ieee
-if [ $(echo $SING_IMG | grep fuzzy) ] ; then
-    METHOD=fuzzy
-fi
+FMRIPREP_VERSION="20.2.1" # fmriprep LTS version to use
+SAMPLING="ieee" # IEEE sampling method
 # paths
 SCRIPT_DIR=$(readlink -e $(dirname $0))
 PROJECT_DIR=$SCRIPT_DIR/..
@@ -41,8 +36,12 @@ case $key in
     shift # past value
     ;;
     --fmriprep-version)
-    SING_IMG="fmriprep-lts-$2.sif" # fmriprep version
-    FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
+    FMRIPREP_VERSION="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    --sampling)
+    SAMPLING="$2"
     shift # past argument
     shift # past value
     ;;
@@ -58,6 +57,15 @@ case $key in
     ;;
 esac
 done
+
+# configure singularity image and path
+if [ ${SAMPLING} = "ieee" ]
+then
+    SING_IMG="fmriprep-lts-${FMRIPREP_VERSION}.sif"
+else
+    SING_IMG="fmriprep-lts-${SAMPLING}-${FMRIPREP_VERSION}.sif"
+fi
+FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
 
 # read all dataset keys
 DATASET_KEYS=($(singularity exec -B $PROJECT_DIR:/WORK $FMRIPREP_CONTAINER \
@@ -94,10 +102,10 @@ print(list_keys)
             read -r -d '' CMD <<- EOM
                 sbatch
                 --account=$ACCOUNT
-                --job-name=fmriprep_${METHOD}_${DATASET}-${PARTICIPANT}_%A_%a.job
+                --job-name=fmriprep_${SAMPLING}_${DATASET}-${PARTICIPANT}_%A_%a.job
                 --mail-user=$MAIL_USER
-                --output=/scratch/%u/.slurm/fmriprep_${METHOD}_${DATASET}-${PARTICIPANT}_%A_%a.out
-                --error=/scratch/%u/.slurm/fmriprep_${METHOD}_${DATASET}-${PARTICIPANT}_%A_%a.err
+                --output=/scratch/%u/.slurm/fmriprep_${SAMPLING}_${DATASET}-${PARTICIPANT}_%A_%a.out
+                --error=/scratch/%u/.slurm/fmriprep_${SAMPLING}_${DATASET}-${PARTICIPANT}_%A_%a.err
                 ${PROJECT_DIR}/code/slurm/${SLURM_SCRIPT} ${DATASET} ${PARTICIPANT} ${SING_IMG}
 EOM
         # raw cmd
