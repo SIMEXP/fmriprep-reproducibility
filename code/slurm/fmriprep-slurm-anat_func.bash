@@ -48,9 +48,9 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
     /WORK/inputs/openneuro/${DATASET} /WORK/inputs/openneuro/${DATASET}/derivatives/fmriprep participant
 fmriprep_exitcode=$?
 
+mkdir -p ${OUTPUT_DIR}_anat
 scp -r ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${OUTPUT_DIR}_anat/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_anat.workdir
 if [ $fmriprep_exitcode -eq 0 ] ; then
-    mkdir -p ${OUTPUT_DIR}_anat
     scp -r ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_anat
     rm -r ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/*
     scp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_anat
@@ -78,9 +78,9 @@ singularity run --cleanenv -B ${SLURM_TMPDIR}/fmriprep-lts:/WORK -B ${HOME}/.cac
     /WORK/inputs/openneuro/${DATASET} /WORK/inputs/openneuro/${DATASET}/derivatives/fmriprep participant
 fmriprep_exitcode=$?
 
+mkdir -p ${OUTPUT_DIR}_func
 scp -r ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work ${OUTPUT_DIR}_func/fmriprep_${DATASET}-${PARTICIPANT}_${SLURM_ARRAY_TASK_ID}_func.workdir
 if [ $fmriprep_exitcode -eq 0 ] ; then
-    mkdir -p ${OUTPUT_DIR}_func
     scp -r ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/* ${OUTPUT_DIR}_func
     rm -r ${SLURM_TMPDIR}/fmriprep-lts/inputs/openneuro/${DATASET}/derivatives/fmriprep/*
     scp ${SLURM_TMPDIR}/fmriprep-lts/fmriprep_work/fmriprep_wf/resource_monitor.json ${OUTPUT_DIR}_func
