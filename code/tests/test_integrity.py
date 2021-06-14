@@ -40,17 +40,6 @@ def get_preproc_list(dir, pattern=".*?"):
 #       myzip.close()
 #   print(digest(output_filename, block_size))
 
-# https://docs.fileformat.com/compression/gz/
-def gzip_footer_check(gzip_filepath):
-  with open(gzip_filepath, "rb") as f:
-    # set cursor to last 8 bytes and read
-    f.seek(-8, os.SEEK_END)
-    gzip_footer = f.read()
-
-    return gzip_footer
-
-
-
 class Test(unittest.TestCase):
   def test_integrity(self):
     dirpath = os.path.join(os.path.dirname(__file__), "..", "..", "outputs", "ieee")
@@ -85,7 +74,7 @@ class Test(unittest.TestCase):
           reduce_sum = str(img.sum())
           for preproc_file in list_preproc_for_dir[1:]:
             img = nib.load(preproc_file).get_fdata()
-            curr_reduce_sum = str(img.sum())
+            curr_reduce_sum = str(img.sum)
             self.assertEqual(curr_reduce_sum, reduce_sum)
 
 if __name__ == "__main__":
