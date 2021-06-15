@@ -1,7 +1,6 @@
 import unittest
 import os
 import re
-import nibabel as nib
 
 def get_preproc_list(dir, pattern=".*?"):
     filepaths = []
@@ -40,6 +39,15 @@ def get_preproc_list(dir, pattern=".*?"):
 #       myzip.close()
 #   print(digest(output_filename, block_size))
 
+# https://docs.fileformat.com/compression/gz/
+def gzip_footer(gzip_filepath):
+  with open(gzip_filepath, "rb") as f:
+    # set cursor to last 8 bytes and read
+    f.seek(-8, os.SEEK_END)
+    gzip_footer = f.read()
+
+    return gzip_footer
+
 class Test(unittest.TestCase):
   def test_integrity(self):
     dirpath = os.path.join(os.path.dirname(__file__), "..", "..", "outputs", "ieee")
@@ -68,14 +76,12 @@ class Test(unittest.TestCase):
         print("\t{}".format(preproc_match))
         filematch = ".*" + folder_match + ".*" + preproc_match
         list_preproc_for_dir = get_preproc_list(dirpath, pattern=filematch)
-        # check if hash for each file is the same
+        # check if gzip footer (CRC-32) for each file
         if list_preproc_for_dir:
-          img = nib.load(list_preproc_for_dir[0]).get_fdata()
-          reduce_sum = str(img.sum())
+          footer = gzip_footer(list_preproc_for_dir[0])
           for preproc_file in list_preproc_for_dir[1:]:
-            img = nib.load(preproc_file).get_fdata()
-            curr_reduce_sum = str(img.sum)
-            self.assertEqual(curr_reduce_sum, reduce_sum)
+            curr_footer = gzip_footer(preproc_file)
+            self.assertEqual(curr_footer, footer)
 
 if __name__ == "__main__":
   Test().test_integrity()
