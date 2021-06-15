@@ -1,0 +1,1 @@
+# jupyter nbconvert --ExecutePreprocessor.timeout=-1 --execute --to html $HOME/Documents/work/fmriprep-lts/code/visualization/report.ipynb --output $HOME/Documents/work/fmriprep-lts/outputs/ieee/stability_report_ds000256/report_multiprocess.html
