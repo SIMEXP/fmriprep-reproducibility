@@ -1,4 +1,4 @@
-# Project fmriprep-lts
+# Project fmriprep-reproducibility
 
 ## Dataset structure
 
