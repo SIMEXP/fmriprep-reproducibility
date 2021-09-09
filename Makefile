@@ -21,6 +21,9 @@ install:
 # @python3 setup.py sdist bdist_wheel
 # @python3 -m pip install -e .
 
+data:
+	@$(bash) code/get_data.bash
+
 test: 
 	@pytest code/tests/
 
