@@ -4,6 +4,7 @@ import re
 import numpy as np
 import nibabel as nib
 import nilearn.plotting
+import matplotlib.pyplot as plt
 
 def get_mutual_mask(n_samples, glob_mask_path, sampling, dataset, participant, task):
   """Get mutually inclusive mask for each experiment iteration
@@ -164,5 +165,12 @@ if __name__ == "__main__":
       , vmax=1.
       , symmetric_cmap=False
       , threshold=1e-2
+      , cut_coords=(0., 0., 0.)
       , bg_img=bg_img)
     html.save_as_html(f"{sampling}_{dataset}_{participant}_{task}_differences.html")
+    pearson_values = pearson_corr.flatten()
+    pearson_values = pearson_values[pearson_values > 0]
+    fig, axes = plt.subplots(nrows=1, ncols=1)
+    axes.hist(pearson_values, bins=100)
+    axes.set_title("Pearson correlation")
+    fig.savefig(f"{sampling}_{dataset}_{participant}_{task}_pearson.png")
