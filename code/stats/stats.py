@@ -3,8 +3,56 @@ import glob
 import re
 import numpy as np
 import nibabel as nib
+import nilearn.plotting
 
-def get_tasks(func_path, sampling, dataset, participant):
+def get_mutual_mask(n_samples, glob_mask_path, sampling, dataset, participant, task):
+  """Get mutually inclusive mask for each experiment iteration
+    
+  Parameters
+  ----------
+    n_samples: int
+      number of experiment iteration
+    glob_mask_path: str
+      glob path to mask images
+    sampling: str
+      sampling method between ieee and fuzzy
+    dataset: str
+      datalad dataset to use
+    participant: str
+      participant id with format `sub-id`
+  Returns
+  -------
+    `np.array` of `np.float32` and shape [x, y, z]: boolean mask image
+  """
+  func_masks= []
+
+  for ii in range(n_samples):
+    # paths definition
+    mask_path = glob.glob(glob_mask_path.format(sampling=sampling, dataset=dataset, ii=ii+1, participant=participant, scan="func", task=task))[0]
+    # mask and image loading
+    func_masks += [nib.load(mask_path).get_fdata().astype('float32')]
+  func_masks = np.array(func_masks)
+  final_func_mask = np.array(np.prod(func_masks, axis=0))
+
+  return final_func_mask
+
+def get_tasks(glob_func_path, sampling, dataset, participant):
+  """Get task names from fmri filepath
+    
+  Parameters
+  ----------
+    glob_func_path: str
+      glob path to functionnal images
+    sampling: str
+      sampling method between ieee and fuzzy
+    dataset: str
+      datalad dataset to use
+    participant: str
+      participant id with format `sub-id`
+  Returns
+  -------
+    `list` of [`str`]: task names
+  """
   # Get tasks name
   list_tasks = []
   func_by_task = glob.glob(glob_func_path.format(sampling=sampling, dataset=dataset, ii=1, participant=participant, scan="func", task="*"))
@@ -16,17 +64,17 @@ def get_tasks(func_path, sampling, dataset, participant):
   return list_tasks
 
 def corr_test_restest(img_1, img_2):
-  """Compute the normalized correlation voxel wise between test and re-test
+  """Compute the pearson correlation voxel wise between test and re-test
     
   Parameters
   ----------
-    img_1 : `np.array` of size [x, y, z, t]
+    img_1: `np.array` of size [x, y, z, t]
       test fMRI image
-    img_2 : `np.array` of size [x, y, z, t]
+    img_2: `np.array` of size [x, y, z, t]
       re-test fMRI image
   Returns
   -------
-    `np.array` of size [x, y, z] : preason correlation voxel wise
+    `np.array` of `np.float32` and shape [x, y, z]: preason correlation voxel wise
   """
   temporal_length = img_1.shape[-1]
   mean_1 = np.mean(img_1, axis=-1)[..., None] @ np.ones((1, 1, 1, temporal_length))
@@ -79,22 +127,22 @@ if __name__ == "__main__":
       input_dir = os.path.join(input_dir, "fmriprep_{dataset}_{ii}", "fmriprep", "{participant}", "{scan}")
 
   glob_func_path = os.path.join(input_dir, "*_task-{task}_" + f"*{output_template}_desc-preproc_bold.nii.gz")
-  glob_mask_path = os.path.join(input_dir, f"*{output_template}_desc-brain_mask.nii.gz")
+  glob_mask_path = os.path.join(input_dir, "*_task-{task}_" + f"*{output_template}_desc-brain_mask.nii.gz")
 
+  # statistics for functionnal images
   for task in get_tasks(glob_func_path, sampling=sampling, dataset=dataset, participant=participant):
     func_images = []
     func_masks = []
     print(f"Starting task {task}")
-    print(f"\t Reading fMRI and mask images...")
+    print(f"\t Reading mask images...")
+    mask_img = get_mutual_mask(n_samples, glob_mask_path, sampling=sampling, dataset=dataset, participant=participant, task=task)
+    print(f"\t Reading fMRI images...")
     for ii in range(n_samples):
       # paths definition
       func_path = glob.glob(glob_func_path.format(sampling=sampling, dataset=dataset, ii=ii+1, participant=participant, scan="func", task=task))[0]
-      mask_path = glob.glob(glob_mask_path.format(sampling=sampling, dataset=dataset, ii=ii+1, participant=participant, scan="anat", task=task))[0]
       # mask and image loading
-      func_masks += [nib.load(mask_path).get_fdata().astype('bool')]
       func_images += [nib.load(func_path).get_fdata()]
-    func_masks = np.array(func_masks)
-    final_func_mask = np.array(np.prod(np.float32(func_masks), axis=0), dtype=np.bool)
+      affine = nib.load(func_path).affine
     print(f"\t Computing voxel-wise pearson correlations...")
     # compute pearson normalized correlation voxel-wise, for each combination of all iterations
     pearson_corr = np.zeros(func_images[0].shape[:-1])
@@ -102,5 +150,19 @@ if __name__ == "__main__":
       for jj in range(ii + 1, n_samples):
         print(f"\t\t {ii} - {jj}")
         pearson_corr += corr_test_restest(func_images[ii], func_images[jj])
-    # mean pearson correlation accros each iteration
+    # mean pearson correlation accros each iteration combination
     pearson_corr /= (n_samples * (n_samples - 1)/2)
+    # masking
+    pearson_corr = pearson_corr * mask_img
+    # saving html view
+    nib_pearson = nib.Nifti1Image((1-pearson_corr) * mask_img, affine)
+    bg_img = nib.Nifti1Image(func_images[0][..., 0], affine)
+    html = nilearn.plotting.view_img(
+      nib_pearson, title=f"{participant} for {task}"
+      , black_bg=True
+      , vmin=0.
+      , vmax=1.
+      , symmetric_cmap=False
+      , threshold=1e-2
+      , bg_img=bg_img)
+    html.save_as_html(f"{sampling}_{dataset}_{participant}_{task}_differences.html")
