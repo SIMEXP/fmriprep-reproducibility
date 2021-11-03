@@ -22,10 +22,10 @@ install:
 # @python3 -m pip install -e .
 
 data:
-	@$(bash) code/get_data.bash
+	@$(bash) fmriprep-reproducibility/get_data.bash
 
 test: 
-	@pytest code/tests/
+	@pytest fmriprep-reproducibility/tests/test_checksum.py
 
 reports:
 # jupyter nbconvert --ExecutePreprocessor.timeout=-1 --execute --to html $HOME/Documents/work/fmriprep-lts/code/visualization/report.ipynb --output $HOME/Documents/work/fmriprep-lts/outputs/ieee/stability_report_ds000256/report_multiprocess.html

@@ -5,7 +5,7 @@
 - All inputs (i.e. building blocks from other sources) are located in
   `inputs/`.
 - Outputs are available at `outputs/`.
-- The code is located in `code/`.
+- The code is located in `fmriprep-reproducibility/`.
 
 # Installation
 
@@ -27,7 +27,7 @@ To install all the data:
 
 `make data`
 
-For a complete overview of all the used datasets, please read [this](https://github.com/SIMEXP/fmriprep-reproducibility/blob/5e7d0d9b0a84eb3e508478192a15d1e5cdfc5a0d/code/get_data.bash#L20-L37).
+For a complete overview of all the used datasets, please read [this](https://github.com/SIMEXP/fmriprep-reproducibility/blob/5e7d0d9b0a84eb3e508478192a15d1e5cdfc5a0d/fmriprep-reproducibility/get_data.bash#L20-L37).
 And for more information on the singularity containers used, check [this section](#execution-environment).
 
 # Usage
@@ -46,7 +46,7 @@ run.bash
 ```
 The recommended way to test the workflow is:
 
-`./code/run.bash --slurm --account def-XXXX --mail XXX@mail.com`
+`./fmriprep-reproducibility/run.bash --slurm --account def-XXXX --mail XXX@mail.com`
 
 # Execution environment
 
