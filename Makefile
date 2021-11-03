@@ -10,7 +10,7 @@ default:
 	@echo
 	@echo '    make install    build the package'
 	@echo '    make test       run the test suite'
-	@echo '    make reports    build the jupyter reports'
+	@echo '    make reports    build the statistic reports'
 	@echo '    make publish    publish changes to GitHub/PyPI'
 	@echo '    make clean      cleanup all temporary files'
 	@echo
@@ -25,10 +25,10 @@ data:
 	@$(bash) fmriprep-reproducibility/get_data.bash
 
 test: 
-	@pytest fmriprep-reproducibility/tests/test_checksum.py
+	@pytest fmriprep-reproducibility/tests/
 
-reports:
-# jupyter nbconvert --ExecutePreprocessor.timeout=-1 --execute --to html $HOME/Documents/work/fmriprep-lts/code/visualization/report.ipynb --output $HOME/Documents/work/fmriprep-lts/outputs/ieee/stability_report_ds000256/report_multiprocess.html
+report:
+	@python3 fmriprep-reproducibility/visualization/make_reports.py
 
 publish:
 # @git push origin && git push --tags origin

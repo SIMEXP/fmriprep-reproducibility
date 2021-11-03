@@ -96,59 +96,95 @@ def corr_test_restest(img_1, img_2):
 
     return corr
 
-# # For each task
-# for task in list_tasks:
-#     func_images = []
-#     func_masks = []
-#     for ii in range(n_samples):
-#         # filenames
-#         func_task = glob.glob(glob_func_path.format(sampling=sampling, dataset=dataset, ii=ii+1, participant=participant, scan=scan, task=task))[0]
-#         glob_func_mask_path = glob.glob(glob_func_path.format(sampling=sampling, dataset=dataset, ii=ii+1, participant=participant, scan=scan, task=task))[0]
-#         # mask loading
-# #         func_masks += [nib.load(mask_file).get_fdata().astype('bool')]
-#         # image loading
-#         nib_img = nib.load(func_task)
-#         func_images += [nib_img.get_fdata()[::5, ::5, ::5]]
-# #     func_masks = np.array(func_masks)
-# #     final_func_mask = np.array(np.prod(np.float32(func_masks), axis=0), dtype=np.bool)
-#     func_images = np.array(func_images)
-#     histogram(func_images, title=f"task-{task}")
-
-# #     parameters = dict(category="raw", participant=participant, dataset=dataset)
-# #     view_sig_dig(func_images, final_func_mask, affine, **parameters)
-
+def plot_stats(inv_pearson_img, pearson_values, bg_img, sampling, dataset, participant, task):
+    """Save difference image and histogram"""
+    figure_dir = os.path.join(os.path.join(os.path.dirname(__file__), "..", "..", "reports", "figures", sampling, dataset, participant))
+    if not os.path.isdir(figure_dir):
+      os.makedirs(figure_dir)
+    diff_img_path = os.path.join(figure_dir, f"{sampling}_{dataset}_{participant}_{task}_differences.html")
+    hist_path = os.path.join(figure_dir, f"{sampling}_{dataset}_{participant}_{task}_pearson.png")
+    # nilearn plot
+    html = nilearn.plotting.view_img(
+        inv_pearson_img
+        , title=f"{participant} for {task}"
+        , black_bg=True
+        , threshold=1e-2
+        , vmax=1
+        , symmetric_cmap=False
+        , cmap = "jet"
+        , cut_coords=(0., 0., 0.)
+        , bg_img=bg_img)
+    html.save_as_html(diff_img_path)
+    # histogram
+    fig, axes = plt.subplots(nrows=1, ncols=1)
+    axes.hist(pearson_values, bins=100)
+    axes.set_title("Pearson correlation")
+    fig.savefig(hist_path)
 
 def compute_task_statistics(
-        input_dir, dataset, participant, task, independent_anat_func=False, exp_multithread=False, exp_multiprocess=False, n_samples=5, sampling="ieee", output_template="MNI152NLin2009cAsym"):
+    fmriprep_output_dir
+    , dataset
+    , participant
+    , task
+    , exp_anat_func=False
+    , exp_multithread=False
+    , exp_multiprocess=False
+    , n_samples=5
+    , sampling="ieee"
+    , output_template="MNI152NLin2009cAsym"):
+    """Compute fmri statistics using pearson correlation voxel wise
+
+    Parameters
+    ----------
+      fmriprep_output_dir: str
+        output directory for fmriprep
+      dataset: str
+        dataset name
+      participant: str
+        full BIDS participant name
+      task: str
+        task name
+      exp_anat_func: bool
+        independent anatomical and functionnal workflow
+      exp_multithread: bool
+        multithreaded workflow enabled
+      exp_multiprocess: bool
+        multitprocessed workflow enabled
+      n_samples: int
+        number of sample for the reproducibility experiments
+      sampling: str
+        sampling method used
+      output_template: str
+        name of the TemplateFlow template used by fmriprep
+    """
 
     # TODO: for debugging, to actually view some differences in the images
-    exp_multithread = True
+    # exp_multithread = True
 
-    if independent_anat_func:
-        input_dir = os.path.join(
-            input_dir, "fmriprep_{dataset}_{ii}_{scan}", "fmriprep", "{participant}", "{scan}")
+    if exp_anat_func:
+        fmriprep_output_dir = os.path.join(
+            fmriprep_output_dir, "fmriprep_{dataset}_{ii}_{scan}", "fmriprep", "{participant}", "{scan}")
     elif exp_multithread:
-        input_dir = os.path.join(
-            input_dir, "fmriprep_{dataset}_{ii}_multithreaded", "fmriprep", "{participant}", "{scan}")
+        fmriprep_output_dir = os.path.join(
+            fmriprep_output_dir, "fmriprep_{dataset}_{ii}_multithreaded", "fmriprep", "{participant}", "{scan}")
     elif exp_multiprocess:
-        input_dir = os.path.join(
-            input_dir, "fmriprep_{dataset}_{ii}_multiprocessed", "fmriprep", "{participant}", "{scan}")
+        fmriprep_output_dir = os.path.join(
+            fmriprep_output_dir, "fmriprep_{dataset}_{ii}_multiprocessed", "fmriprep", "{participant}", "{scan}")
     else:
-        input_dir = os.path.join(
-            input_dir, "fmriprep_{dataset}_{ii}", "fmriprep", "{participant}", "{scan}")
+        fmriprep_output_dir = os.path.join(
+            fmriprep_output_dir, "fmriprep_{dataset}_{ii}", "fmriprep", "{participant}", "{scan}")
 
     glob_func_path = os.path.join(
-        input_dir, "*_task-{task}_" + f"*{output_template}_desc-preproc_bold.nii.gz")
+        fmriprep_output_dir, "*_task-{task}_" + f"*{output_template}_desc-preproc_bold.nii.gz")
     glob_mask_path = os.path.join(
-        input_dir, "*_task-{task}_" + f"*{output_template}_desc-brain_mask.nii.gz")
+        fmriprep_output_dir, "*_task-{task}_" + f"*{output_template}_desc-brain_mask.nii.gz")
 
     # statistics for functionnal images
     func_images = []
-    print(f"Starting task {task}")
-    print(f"\t Reading mask images...")
+    print(f"Starting {participant} from {dataset} with task {task}")
+    print(f"\t Reading mask and fMRI images...")
     mask_img = get_mutual_mask(n_samples, glob_mask_path, sampling=sampling,
                                 dataset=dataset, participant=participant, task=task)
-    print(f"\t Reading fMRI images...")
     for ii in range(n_samples):
         # paths definition
         func_path = glob.glob(glob_func_path.format(
@@ -166,18 +202,11 @@ def compute_task_statistics(
                 func_images[ii], func_images[jj])
     # mean pearson correlation accros each iteration combination
     pearson_corr /= (n_samples * (n_samples - 1)/2)
-    # masking
-    pearson_corr = pearson_corr * mask_img
-    # saving html view
-    nib_pearson = nib.Nifti1Image((1-pearson_corr) * mask_img, affine)
-    bg_img = nib.Nifti1Image(func_images[0][..., 0], affine)
-    html = nilearn.plotting.view_img(
-        nib_pearson, title=f"{participant} for {task}", black_bg=True, vmin=0., vmax=1., symmetric_cmap=False, threshold=1e-2, cut_coords=(0., 0., 0.), bg_img=bg_img)
-    html.save_as_html(
-        f"{sampling}_{dataset}_{participant}_{task}_differences.html")
+    # saving stats images
+    print(f"\t Saving figures...")
     pearson_values = pearson_corr.flatten()
-    pearson_values = pearson_values[pearson_values > 0]
-    fig, axes = plt.subplots(nrows=1, ncols=1)
-    axes.hist(pearson_values, bins=100)
-    axes.set_title("Pearson correlation")
-    fig.savefig(f"{sampling}_{dataset}_{participant}_{task}_pearson.png")
+    inv_pearson_corr = (1 - pearson_corr) * mask_img # invert perason to be able to threshold
+    inv_pearson_img = nib.Nifti1Image(inv_pearson_corr, affine)
+    bg_img = nib.Nifti1Image(func_images[0][..., 0], affine)
+    plot_stats(inv_pearson_img, pearson_values, bg_img, sampling, dataset, participant, task)
+
