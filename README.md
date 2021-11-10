@@ -48,6 +48,16 @@ The recommended way to test the workflow is:
 
 `./fmriprep-reproducibility/run.bash --slurm --account def-XXXX --mail XXX@mail.com`
 
+# Reports
+
+To generate html reproducibility figures of the functionnal pipeline, you can run:
+
+`make report`
+
+There are multiple arguments available, for example to list all available arguments call:
+
+`make report ARGS="--help"`
+
 # Execution environment
 
 ## Usage

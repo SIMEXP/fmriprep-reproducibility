@@ -3,6 +3,14 @@
 PACKAGE_NAME = $(shell python3 setup.py --name)
 PACKAGE_VERSION = $(shell python3 setup.py --version)
 
+# Add arguments to "make report"
+ifeq (report,$(firstword $(MAKECMDGOALS)))
+  # use the rest as arguments for "report"
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # ...and turn them into do-nothing targets
+  $(eval $(RUN_ARGS):;@:)
+endif
+
 default:
 	@echo "Makefile for $(PACKAGE_NAME) $(PACKAGE_VERSION)"
 	@echo
@@ -28,7 +36,7 @@ test:
 	@pytest fmriprep-reproducibility/tests/
 
 report:
-	@python3 fmriprep-reproducibility/visualization/make_reports.py
+	@python3 fmriprep-reproducibility/visualization/make_reports.py $(ARGS)
 
 publish:
 # @git push origin && git push --tags origin
