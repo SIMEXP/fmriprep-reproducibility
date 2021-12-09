@@ -157,7 +157,8 @@ def compute_task_statistics(
       output_template: str
         name of the TemplateFlow template used by fmriprep
     """
-
+    # TODO: use fmriprep BIDS derivative output to go through all the files: 
+    # https://github.com/ccna-biomarkers/ccna_qc/blob/31d2fdd356d93d887c5ac24a8d7674521e233a1a/src/features/build_features.py#L176
     # TODO: for debugging, to actually view some differences in the images
     # exp_multithread = True
 
