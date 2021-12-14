@@ -141,7 +141,7 @@ def plot_stats(inv_pearson_img, pearson_values, bg_img, sampling, dataset, parti
     threshold = 1e-2
     vmax = 1
     if anat:
-        threshold = None
+        threshold = 10
         vmax = None
     html = nilearn.plotting.view_img(
         inv_pearson_img
@@ -325,14 +325,14 @@ def compute_anat_statistics(
     for ii in range(n_samples - 1):
         for jj in range(ii + 1, n_samples):
             print(f"\t\t {ii} - {jj}")
-            diff += anat_images[ii] - anat_images[jj]
+            diff += np.abs(anat_images[ii] - anat_images[jj])
     # mean pearson correlation accros each iteration combination
     diff /= (n_samples * (n_samples - 1)/2)
     # saving stats images
     print(f"\t Saving figures...")
     diff_values = diff.flatten()
-    inv_diff = (1/diff) * mask_img # invert perason to be able to threshold
-    inv_diff_img = nib.Nifti1Image(inv_diff, affine)
+    masked_diff = diff * mask_img # masking raw differences
+    inv_diff_img = nib.Nifti1Image(masked_diff, affine)
     bg_img = nib.Nifti1Image(anat_images[0], affine)
     plot_stats(inv_diff_img, diff_values, bg_img, sampling, dataset, participant, anat=True)
 

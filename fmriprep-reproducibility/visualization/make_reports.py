@@ -50,7 +50,6 @@ if __name__ == "__main__":
     args = get_parser()
     print("\n### Running make-reports\n")
     print(vars(args))
-
     # input path, where fmriprep experiments lives
     if args.input_dir == ".":
         input_path = os.path.join(os.path.dirname(__file__),
