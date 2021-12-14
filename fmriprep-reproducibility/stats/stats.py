@@ -39,6 +39,38 @@ def get_mutual_mask(n_samples, glob_mask_path, sampling, dataset, participant, t
 
     return final_func_mask
 
+def get_mutual_anat_mask(n_samples, glob_mask_path, sampling, dataset, participant, task="*"):
+    """Get mutually inclusive mask for each experiment iteration
+
+    Parameters
+    ----------
+      n_samples: int
+        number of experiment iteration
+      glob_mask_path: str
+        glob path to mask images
+      sampling: str
+        sampling method between ieee and fuzzy
+      dataset: str
+        datalad dataset to use
+      participant: str
+        participant id with format `sub-id`
+    Returns
+    -------
+      `np.array` of `np.float32` and shape [x, y, z]: boolean mask image
+    """
+    anat_masks = []
+
+    for ii in range(n_samples):
+        # paths definition
+        mask_path = glob.glob(glob_mask_path.format(
+            sampling=sampling, dataset=dataset, ii=ii+1, participant=participant, scan="anat"))[0]
+        # mask and image loading
+        anat_masks += [nib.load(mask_path).get_fdata().astype('float32')]
+    anat_masks = np.array(anat_masks)
+    final_anat_mask = np.array(np.prod(anat_masks, axis=0))
+
+    return final_anat_mask
+
 
 def get_tasks(glob_func_path, sampling, dataset, participant):
     """Get task names from fmri filepath
@@ -96,20 +128,27 @@ def corr_test_restest(img_1, img_2):
 
     return corr
 
-def plot_stats(inv_pearson_img, pearson_values, bg_img, sampling, dataset, participant, task):
+def plot_stats(inv_pearson_img, pearson_values, bg_img, sampling, dataset, participant, task="", anat=False):
     """Save difference image and histogram"""
     figure_dir = os.path.join(os.path.join(os.path.dirname(__file__), "..", "..", "reports", "figures", sampling, dataset, participant))
     if not os.path.isdir(figure_dir):
       os.makedirs(figure_dir)
+    if anat:
+        task = "anat"
     diff_img_path = os.path.join(figure_dir, f"{sampling}_{dataset}_{participant}_{task}_differences.html")
     hist_path = os.path.join(figure_dir, f"{sampling}_{dataset}_{participant}_{task}_pearson.png")
     # nilearn plot
+    threshold = 1e-2
+    vmax = 1
+    if anat:
+        threshold = None
+        vmax = None
     html = nilearn.plotting.view_img(
         inv_pearson_img
         , title=f"{participant} for {task}"
         , black_bg=True
-        , threshold=1e-2
-        , vmax=1
+        , threshold=threshold
+        , vmax=vmax
         , symmetric_cmap=False
         , cmap = "jet"
         , cut_coords=(0., 0., 0.)
@@ -118,7 +157,10 @@ def plot_stats(inv_pearson_img, pearson_values, bg_img, sampling, dataset, parti
     # histogram
     fig, axes = plt.subplots(nrows=1, ncols=1)
     axes.hist(pearson_values, bins=100)
-    axes.set_title("Pearson correlation")
+    if anat:
+        axes.set_title("Mean raw differences")
+    else:
+        axes.set_title("Pearson correlation")
     fig.savefig(hist_path)
 
 def compute_task_statistics(
@@ -158,7 +200,7 @@ def compute_task_statistics(
         name of the TemplateFlow template used by fmriprep
     """
     # TODO: use fmriprep BIDS derivative output to go through all the files: 
-    # https://github.com/ccna-biomarkers/ccna_qc/blob/31d2fdd356d93d887c5ac24a8d7674521e233a1a/src/features/build_features.py#L176
+    # https://github.com/ccna-biomarkers/ccna_qc/blob/31d2fdd356d93d887c5ac24a8d7674521e233a1a/src/features/build_features.py#L172-L176
     # TODO: for debugging, to actually view some differences in the images
     # exp_multithread = True
 
@@ -182,7 +224,7 @@ def compute_task_statistics(
 
     # statistics for functionnal images
     func_images = []
-    print(f"Starting {participant} from {dataset} with task {task}")
+    print(f"Starting func {participant} from {dataset} with task {task}")
     print(f"\t Reading mask and fMRI images...")
     mask_img = get_mutual_mask(n_samples, glob_mask_path, sampling=sampling,
                                 dataset=dataset, participant=participant, task=task)
@@ -210,4 +252,87 @@ def compute_task_statistics(
     inv_pearson_img = nib.Nifti1Image(inv_pearson_corr, affine)
     bg_img = nib.Nifti1Image(func_images[0][..., 0], affine)
     plot_stats(inv_pearson_img, pearson_values, bg_img, sampling, dataset, participant, task)
+
+
+def compute_anat_statistics(
+    fmriprep_output_dir
+    , dataset
+    , participant
+    , exp_anat_func=False
+    , exp_multithread=False
+    , exp_multiprocess=False
+    , n_samples=5
+    , sampling="ieee"
+    , output_template="MNI152NLin2009cAsym"):
+    """Compute anatomical statistics using voxel wise difference
+
+    Parameters
+    ----------
+      fmriprep_output_dir: str
+        output directory for fmriprep
+      dataset: str
+        dataset name
+      participant: str
+        full BIDS participant name
+      exp_anat_func: bool
+        independent anatomical and functionnal workflow
+      exp_multithread: bool
+        multithreaded workflow enabled
+      exp_multiprocess: bool
+        multitprocessed workflow enabled
+      n_samples: int
+        number of sample for the reproducibility experiments
+      sampling: str
+        sampling method used
+      output_template: str
+        name of the TemplateFlow template used by fmriprep
+    """
+
+    if exp_anat_func:
+        fmriprep_output_dir = os.path.join(
+            fmriprep_output_dir, "fmriprep_{dataset}_{ii}_{scan}", "fmriprep", "{participant}", "{scan}")
+    elif exp_multithread:
+        fmriprep_output_dir = os.path.join(
+            fmriprep_output_dir, "fmriprep_{dataset}_{ii}_multithreaded", "fmriprep", "{participant}", "{scan}")
+    elif exp_multiprocess:
+        fmriprep_output_dir = os.path.join(
+            fmriprep_output_dir, "fmriprep_{dataset}_{ii}_multiprocessed", "fmriprep", "{participant}", "{scan}")
+    else:
+        fmriprep_output_dir = os.path.join(
+            fmriprep_output_dir, "fmriprep_{dataset}_{ii}", "fmriprep", "{participant}", "{scan}")
+
+    glob_anat_path = os.path.join(
+        fmriprep_output_dir, f"*{output_template}_desc-preproc_T1w.nii.gz")
+    glob_mask_path = os.path.join(
+        fmriprep_output_dir, f"*{output_template}_desc-brain_mask.nii.gz")
+
+    # statistics for anat images
+    anat_images = []
+    print(f"Starting anat {participant} from {dataset}")
+    print(f"\t Reading mask and anat images...")
+    mask_img = get_mutual_anat_mask(n_samples, glob_mask_path, sampling=sampling,
+                                    dataset=dataset, participant=participant)
+    for ii in range(n_samples):
+        # paths definition
+        anat_path = glob.glob(glob_anat_path.format(
+            sampling=sampling, dataset=dataset, ii=ii+1, participant=participant, scan="anat"))[0]
+        # mask and image loading
+        anat_images += [nib.load(anat_path).get_fdata()]
+        affine = nib.load(anat_path).affine
+    print(f"\t Computing voxel-wise differences...")
+    # compute voxel-wise differences, for each combination of all iterations
+    diff = np.zeros(anat_images[0].shape)
+    for ii in range(n_samples - 1):
+        for jj in range(ii + 1, n_samples):
+            print(f"\t\t {ii} - {jj}")
+            diff += anat_images[ii] - anat_images[jj]
+    # mean pearson correlation accros each iteration combination
+    diff /= (n_samples * (n_samples - 1)/2)
+    # saving stats images
+    print(f"\t Saving figures...")
+    diff_values = diff.flatten()
+    inv_diff = (1/diff) * mask_img # invert perason to be able to threshold
+    inv_diff_img = nib.Nifti1Image(inv_diff, affine)
+    bg_img = nib.Nifti1Image(anat_images[0], affine)
+    plot_stats(inv_diff_img, diff_values, bg_img, sampling, dataset, participant, anat=True)
 
