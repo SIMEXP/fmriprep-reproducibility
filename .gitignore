@@ -1,6 +1,6 @@
 .vscode
 .ipynb_checkpoints
 *~
-#*
-outputs/
 __pycache__
+outputs
+reports
