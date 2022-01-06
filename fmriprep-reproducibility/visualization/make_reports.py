@@ -48,9 +48,8 @@ def get_parser():
 
 
 if __name__ == "__main__":
-    #TODO: BIDS layout to read files
-    #TODO: scipy.stats.ttest_rel paired student test
-    #TODO: rainplotclouds for stats reports
+    #TODO: pixel wise comparison with fuzzy outputs (order testing or assume gaussian for confidence interval)
+    #TODO: rainplotclouds for pairwise differences visualization (one for each, fuzzy and ieee)
     args = get_parser()
     print("\n### Running make-reports\n")
     print(vars(args))
