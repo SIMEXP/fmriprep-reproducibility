@@ -17,7 +17,7 @@ def get_parser():
       """)
 
     parser.add_argument(
-        "-i", "--input_dir", required=False, default=".", help="Input data directory (default: install directory)",
+        "-i", "--input_dir", required=False, default=".", help="Input data directory with ieee and/or fuzzy folders (default: install directory)",
     )
 
     parser.add_argument(
@@ -49,16 +49,21 @@ def get_parser():
 
 if __name__ == "__main__":
     #TODO: pixel wise comparison with fuzzy outputs (order testing or assume gaussian for confidence interval)
-    #TODO: rainplotclouds for pairwise differences visualization (one for each, fuzzy and ieee)
+    #TODO: review file integrity check to (maybe) compare with fuzzy reference (first iteration of fuzzy for ex) ?
+    # if outputs has more than 1 iteration, make reports (for us to be saved in inputs/reference/fuzzy/ieee)
+    #TODO: rainplotclouds for pairwise differences visualization
+    #TODO: mean and average images (just for anat)
     args = get_parser()
     print("\n### Running make-reports\n")
     print(vars(args))
+    # reference path, where pre-generated output lives
+    reference_dir = os.path.join(os.path.dirname(__file__), "..", "..", "inputs", "reference", "fmriprep", "fuzzy")
     # input path, where fmriprep experiments lives
     if args.input_dir == ".":
         input_dir = os.path.join(os.path.dirname(__file__),
                                   "..", "..", "outputs", args.sampling)
     else:
-        input_dir = os.path.join(args.input_dir, "outputs", args.sampling)
+        input_dir = os.path.join(args.input_dir, args.sampling)
     if args.exp_multithread:
         experience_name = "_multithreaded"
     elif args.exp_multiprocess:
@@ -67,17 +72,20 @@ if __name__ == "__main__":
         experience_name = "_anat"
     else:
         experience_name = ""
-    # get all experiment paths and dataset names
+    # get all experiment and reference input paths and dataset names
     experiments_path, dataset_names = get_data.get_dataset_list(input_dir, experience_name)
+    references_path, _ = get_data.get_dataset_list(reference_dir, experience_name)
     # loop through each dataset and do the job
     for dataset_name in dataset_names:
         print(f"\t Processing {dataset_name}")
         # extract list of experiments for the given dataset, and related files
-        fmriprep_outputs_path, iterations = get_data.get_experiment_paths(experiments_path, dataset_name)
+        fmriprep_outputs_path, output_iterations = get_data.get_experiment_paths(experiments_path, dataset_name)
+        reference_outputs_path, reference_iterations = get_data.get_experiment_paths(references_path, dataset_name)
+        #TODO take idx (fmriprep_outputs_path[0]) of output experiment in a loop of all output iterations
         bids_images, bids_masks = get_data.get_bids_files(fmriprep_outputs_path[0]) # assume same files layout for each exp iteration (`make test` to check file integrity)
         # iterate through all files
         for bids_image, bids_mask in zip(bids_images, bids_masks):
-            stats.new_compute_task_statistics(bids_image, bids_mask, iterations)
+            stats.new_compute_task_statistics(bids_image, bids_mask, reference_iterations, reference_dir)
 
 
     # dataset_sub_task_dict = {}

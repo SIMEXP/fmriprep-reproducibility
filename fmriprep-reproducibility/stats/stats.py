@@ -199,46 +199,24 @@ def descriptive_statistics(samples, name=""):
 
     return descriptive_stats
 
-def new_compute_task_statistics(bids_image, bids_mask, iterations):
+def new_compute_task_statistics(bids_image, bids_mask, iterations, reference_dir):
 
     # functionnal and anat have different results
     is_func = True
     if bids_image.entities['datatype'] == "anat":
         is_func = False
         # differences
+    # match subpath to be replaced to iterate over reference
+    input_subpath = re.match("(.*/ieee|fuzzy).*", bids_image.path)[1]
+    input_iteration = re.match(".*_(ds\d+_\d).*", bids_image.path)[1]
     # get images and mask path for each experiment iteration
-    iteration_match = re.match(".*(_\d_).*", bids_mask.path)[1]
-    images_path = [bids_image.path.replace(iteration_match, f"_{ii}_") for ii in iterations]
-    masks_path = [bids_mask.path.replace(iteration_match, f"_{ii}_") for ii in iterations]
+    ref_images_path = []
+    ref_masks_path = []
+    for ii in iterations:
+        ref_images_path += [bids_image.path.replace(input_subpath, reference_dir).replace(input_iteration, input_iteration[:-1] + ii)]
+        ref_masks_path += [bids_mask.path.replace(input_subpath, reference_dir).replace(input_iteration, input_iteration[:-1] + ii)]
     # compute mutual mask, this assumes same affine
-    mutual_mask = compute_mutual_mask(masks_path)
-    # for image_path in images_path:
-    #   # pearson voxel-wise correlation
-    #   # if is_func:
-      
-    #   # raw pixel differences
-    #   if not is_func:
-    #     # mask and image loading
-    #     anat_images += [nib.load(anat_path).get_fdata()]
-    #     affine = nib.load(anat_path).affine
-    #     print(f"\t Computing voxel-wise differences...")
-    #     # compute voxel-wise differences, for each combination of all iterations
-    #     diff = np.zeros(anat_images[0].shape)
-    #     for ii in range(n_samples - 1):
-    #         for jj in range(ii + 1, n_samples):
-    #             print(f"\t\t {ii} - {jj}")
-    #             diff += np.abs(anat_images[ii] - anat_images[jj])
-    #     # mean pearson correlation accros each iteration combination
-    #     diff /= (n_samples * (n_samples - 1)/2)
-    #     # saving stats images
-    #     print(f"\t Saving figures...")
-    #     diff_values = diff.flatten()
-    #     masked_diff = diff * mask_img # masking raw differences
-    #     inv_diff_img = nib.Nifti1Image(masked_diff, affine)
-    #     bg_img = nib.Nifti1Image(anat_images[0], affine)
-    #     plot_stats(inv_diff_img, diff_values, bg_img, sampling, dataset, participant, anat=True)
-
-
+    ref_mutual_mask = compute_mutual_mask(ref_masks_path)
 
 def compute_task_statistics(
     fmriprep_output_dir
