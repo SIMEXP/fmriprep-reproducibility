@@ -6,10 +6,10 @@ import bids
 def get_dataset_list(input_dir, experience_name):
     '''Get all the dataset names and related absolute path'''
     list_experiment_path = [os.path.join(input_dir, dir) for dir in os.listdir(
-        input_dir) if experience_name in dir]
+        input_dir) if re.match(".*fmriprep_ds\d+_\d" + experience_name + "$", dir)]
     dataset_names = [re.match(".*fmriprep_(ds\d+)_.*", path)[1]
                      for path in list_experiment_path]
-    dataset_names = list(set(list(dataset_names)))
+    dataset_names = sorted(dataset_names)
 
     return list_experiment_path, dataset_names
 
@@ -18,9 +18,9 @@ def get_experiment_paths(list_experiment_path, dataset_name):
     '''Get the path and number of reproducibility experiments'''
     list_fmriprep_output = [
         path for path in list_experiment_path if dataset_name in path]
-    iterations = [re.match(".*_(\d)_.*", folder)[1]
+    iterations = [re.match(".*_ds\d+_(\d).*", folder)[1]
                   for folder in list_fmriprep_output]
-    iterations = list(set(list(iterations)))
+    iterations = sorted(iterations)
 
     return list_fmriprep_output, iterations
 

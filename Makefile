@@ -38,7 +38,13 @@ test:
 report:
 	@python3 fmriprep-reproducibility/visualization/make_reports.py $(ARGS)
 
+reference:
+	@python3 fmriprep-reproducibility/data/make_reference.py
+
 publish:
+#datalad commit reference
+#datalad push --to osf
+
 # @git push origin && git push --tags origin
 # @python3 -m pip install twine wheel setuptools
 # @$(MAKE) install
