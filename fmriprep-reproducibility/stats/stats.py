@@ -199,6 +199,25 @@ def descriptive_statistics(samples, name=""):
 
     return descriptive_stats
 
+def compute_anat_distribution_parameters(bids_image, bids_mask, iterations):
+    """Compute anatomical distribution (mean and standard deviation)"""
+
+    # match subpath to be replaced to iterate
+    input_iteration = re.match(".*_(ds\d+_\d).*", bids_image.path)[1]
+    images_path = []
+    masks_path = []
+    for ii in iterations:
+        images_path += [bids_image.path.replace(input_iteration, input_iteration[:-1] + ii)]
+        masks_path += [bids_mask.path.replace(input_iteration, input_iteration[:-1] + ii)]
+    # compute mean and std images, this assumes same affine
+    images = [nib.load(image_path).get_fdata().astype('float32') for image_path in images_path]
+    mean_img = np.array(np.mean(images, axis=0))
+    std_img = np.array(np.std(images, axis=0))
+    # compute mutual mask, this assumes same affine
+    mutual_mask = compute_mutual_mask(masks_path)
+
+    return [mean_img, std_img], mutual_mask
+
 def new_compute_task_statistics(bids_image, bids_mask, iterations, reference_dir):
 
     # functionnal and anat have different results
@@ -307,7 +326,6 @@ def compute_task_statistics(
     inv_pearson_img = nib.Nifti1Image(inv_pearson_corr, affine)
     bg_img = nib.Nifti1Image(func_images[0][..., 0], affine)
     plot_stats(inv_pearson_img, pearson_values, bg_img, sampling, dataset, participant, task)
-
 
 def compute_anat_statistics(
     fmriprep_output_dir

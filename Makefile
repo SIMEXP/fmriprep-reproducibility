@@ -41,10 +41,11 @@ report:
 reference:
 	@python3 fmriprep-reproducibility/data/make_reference.py
 
-publish:
+publish-reference:
 #datalad commit reference
 #datalad push --to osf
 
+publish:
 # @git push origin && git push --tags origin
 # @python3 -m pip install twine wheel setuptools
 # @$(MAKE) install
