@@ -39,7 +39,7 @@ report:
 	@python3 fmriprep-reproducibility/visualization/make_reports.py $(ARGS)
 
 reference:
-	@python3 fmriprep-reproducibility/data/make_reference.py
+	@python3 fmriprep-reproducibility/data/make_reference.py $(ARGS)
 
 publish-reference:
 #datalad commit reference
