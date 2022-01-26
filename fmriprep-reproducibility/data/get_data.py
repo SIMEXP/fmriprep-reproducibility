@@ -4,7 +4,7 @@ import bids
 import shutil
 
 
-def get_dataset_list(input_dir, experience_name):
+def get_dataset_list(input_dir, experience_name=""):
     '''Get all the dataset names and related absolute path'''
     list_experiment_path = [os.path.join(input_dir, dir) for dir in os.listdir(
         input_dir) if re.match(".*fmriprep_ds\d+_\d" + experience_name + "$", dir)]
