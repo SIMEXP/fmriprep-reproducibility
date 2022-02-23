@@ -11,7 +11,7 @@
 
 The fmriprep-reproducibility rely heavily on [Datalad](https://www.datalad.org/), so make sure it is installed in your environment.
 
-`datalad install -r -R 1 git@github.com:SIMEXP/fmriprep-lts.git`
+`datalad install -r -R 1 git@github.com:SIMEXP/fmriprep-reproducibility.git`
 
 When the installation finished, you can install the other software dependencies needed by our tool:
 
