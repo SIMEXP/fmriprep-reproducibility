@@ -8,7 +8,7 @@ echo ""
 SUBMIT=false # whether to launch the jobs or just print the commands
 SLURM=false # whether to submit slurm jobs or raw cmd
 SLURM_SCRIPT="fmriprep-slurm.bash" # slurm script name
-FMRIPREP_VERSION="20.2.1" # fmriprep LTS version to use
+FMRIPREP_VERSION="20.2.0" # fmriprep LTS version to use
 SAMPLING="ieee" # IEEE sampling method
 # paths
 SCRIPT_DIR=$(readlink -e $(dirname $0))

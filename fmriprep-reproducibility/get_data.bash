@@ -5,7 +5,7 @@ SCRIPT_DIR=$(readlink -e $(dirname $0))
 PROJECT_DIR=..
 OPENNEURO=$PROJECT_DIR/inputs/openneuro/
 TEMPLATEFLOW_DIR=/home/$USER/.cache/templateflow
-SING_IMG=fmriprep-lts-20.2.1.sif
+SING_IMG=fmriprep-lts-20.2.0.sif
 FMRIPREP_CONTAINER=$PROJECT_DIR/envs/singularity-images/$SING_IMG
 
 cd $SCRIPT_DIR

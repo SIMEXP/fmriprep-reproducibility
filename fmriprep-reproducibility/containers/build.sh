@@ -21,7 +21,7 @@ function docker2singularity(){
     
 }
 
-FMRIPREP_VERSION=20.2.1
+FMRIPREP_VERSION=20.2.0
 
 # Build regular (non-fuzzy) image from Poldrack lab Docker image
 docker2singularity nipreps/fmriprep:${FMRIPREP_VERSION} fmriprep-lts-${FMRIPREP_VERSION}
