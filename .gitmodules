@@ -6,3 +6,8 @@
 	path = envs/singularity-images
 	url = https://github.com/glatard/fmriprep-lts-images.git
 	datalad-id = f1985003-afb4-4bf2-80d0-7139f890d4c2
+[submodule "inputs/fmriprep-reproducibility-reference"]
+	path = inputs/fmriprep-reproducibility-reference
+	url = https://github.com/SIMEXP/fmriprep-reproducibility-reference.git
+	datalad-id = 0e752cde-14e2-4a34-9f71-957a906b7dc3
+	datalad-url = https://github.com/SIMEXP/fmriprep-reproducibility-reference.git
