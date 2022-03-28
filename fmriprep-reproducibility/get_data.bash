@@ -16,6 +16,9 @@ git annex enableremote osf-annex2-storage
 cd $SCRIPT_DIR
 datalad get $PROJECT_DIR/envs/singularity-images/fmriprep-lts*
 
+######### Get the reference
+datalad get -r $PROJECT_DIR/inputs/fmriprep-reproducibility-reference
+
 ######### Get the raw data
 ## Age
 # children male ds000256/sub-CTS201
@@ -77,7 +80,7 @@ singularity exec -B $PROJECT_DIR:/WORK \
   $FMRIPREP_CONTAINER \
   python3 -c """
 from templateflow.api import get;
-get(['MNI152NLin2009cAsym', 'MNI152NLin6Asym'])
+get(['MNI152NLin2009cAsym', 'MNI152NLin6Asym', 'OASIS30ANTs', 'MNIPediatricAsym', 'MNIInfant']])
 """
 
 cd $CURR_DIR
