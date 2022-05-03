@@ -96,7 +96,7 @@ print(list_keys)
     # loop through all participants
     for PARTICIPANT in ${PARTICIPANT_KEYS[@]}
     do
-        # slurm cmd
+        # slurm run
         if [ "$SLURM" = true ] ; then
             mkdir -p /scratch/$USER/.slurm
             read -r -d '' CMD <<- EOM
@@ -108,16 +108,24 @@ print(list_keys)
                 --error=/scratch/%u/.slurm/fmriprep_${SAMPLING}_${DATASET}-${PARTICIPANT}_%A_%a.err
                 ${PROJECT_DIR}/fmriprep-reproducibility/slurm/${SLURM_SCRIPT} ${DATASET} ${PARTICIPANT} ${SING_IMG}
 EOM
-        # raw cmd
+        # local run
+        #TODO: create and test raw singularity command
         else
             read -r -d '' CMD <<- EOM
-                raw singularity command
+                singularity run --cleanenv -B ../:/WORK -B ${HOME}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ \
+                    envs/singularity-images/${SING_IMG} \
+                    -w /WORK/fmriprep_work \
+                    --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym \
+                    --notrack --write-graph --resource-monitor \
+                    --omp-nthreads 1 --nprocs 1 --mem_mb 65536 \
+                    --participant-label ${PARTICIPANT} --random-seed 0 --skull-strip-fixed-seed \
+                    /WORK/inputs/openneuro/${DATASET} /WORK/inputs/openneuro/${DATASET}/derivatives/fmriprep participant
 EOM
         fi
-        # print command
+        # print slurm command
         if [ "$SUBMIT" = true ] ; then
             $CMD
-        # execute command
+        # print local command
         else
             echo $CMD
             echo ""

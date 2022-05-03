@@ -32,6 +32,9 @@ install:
 data:
 	@$(bash) fmriprep-reproducibility/get_data.bash
 
+run:
+	@$(bash) fmriprep-reproducibility/run.bash
+
 test: 
 	@pytest fmriprep-reproducibility/tests/
 
